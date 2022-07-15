@@ -5,9 +5,7 @@ import store from './store/store'
 
 const app=createApp(App)
 
-
-
 app
-    .use(router)
     .use(store)
+    .use(router)
     .mount('#app')

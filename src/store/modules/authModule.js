@@ -1,6 +1,4 @@
-import {
-    authAPI
-} from '@/api/authAPI'
+import {authAPI} from '@/api/authAPI'
 
 export default {
     state: function () {
@@ -8,6 +6,12 @@ export default {
             isAuth: false,
             isShowDialogLogin: false,
             isSchowDialogRegister: false,
+
+            isDoneLogin:true,
+            isDoneUnlogin:true,
+            isDoneRegister:true,
+
+            userId:null,
 
             authObj: {
                 login: '',
@@ -18,7 +22,9 @@ export default {
                 email: '',
                 name: '',
                 password: ''
-            }
+            },
+
+
         }
     },
 
@@ -35,6 +41,20 @@ export default {
         },
         setIsShowDialogRegister(state, isShow) {
             state.isSchowDialogRegister = isShow
+        },
+
+        setIsDoneLogin(state,isDone){
+            state.isDoneLogin=isDone
+        },
+        setIsDoneUnlogin(state,isDone){
+            state.isDoneUnlogin=isDone
+        },
+        setIsDoneRegister(state,isDone){
+            state.isDoneRegister=isDone
+        },
+
+        setUserId(state,userId){
+            state.userId=userId
         },
 
         setAuthLogin(state, login) {
@@ -58,41 +78,68 @@ export default {
     actions: {
         async login({commit,dispatch,}, payload) {
             try {
+                commit('setIsDoneLogin',false)
+
                 const response=await authAPI.login(payload)
+                commit('error/setLoginError',null,{root:true})
+                commit('setUserId',response.data.userId)
+                
                 commit('setIsAuth', true)
-        
                 commit('setIsShowDialogLogin', false)
                 commit('setAuthLogin', '')
-                commit('setAuthPassword', '')
 
                 await dispatch('user/getUser',response.data.userId,{root:true})
 
                 return true
             } catch (error) {
-                console.log(error)
+                commit('error/setLoginError',{
+                    message:error.response.data?error.response.data.message:error.message,
+                    code:error.response.status,
+                },{root:true})
+            }finally{
+                commit('setIsDoneLogin',true)
+                commit('setAuthPassword', '')
+                commit('setUserId',null)
             }
         },
 
         async unlogin({commit}) {
             try {
+                commit('setIsDoneUnlogin',false)
                 await authAPI.unlogin()
+                commit('error/setUnloginError',null,{root:true})
+
                 commit('setIsAuth', false)
                 commit('user/setUserData',null,{root:true})
+
+                commit('messages/clearMessages',null,{root:true})
+                commit('messages/setRoomId',null,{root:true})
+
                 return true
             } catch (error) {
-                console.log(error)
+                commit('error/setUnloginError',{
+                    message:error.response.data?error.response.data.message:error.message,
+                    code:error.response.status
+                },{root:true})
+            }finally{
+                commit('setIsDoneUnlogin',true)
             }
         },
 
         async register({state,commit,dispatch}) {
             try {
-                const response =await authAPI.register({
+                commit('setIsDoneRegister', false)
+
+                await authAPI.register({
                     email: state.registerObj.email,
                     name: state.registerObj.name,
                     password: state.registerObj.password
                 })
+                commit('error/setRegisterError',null,{root:true})
 
-                dispatch('login',{
+                await dispatch('unlogin')
+
+                await dispatch('login',{
                     login: state.registerObj.email,
                     password: state.registerObj.password
                 })
@@ -100,10 +147,15 @@ export default {
                 commit('setIsShowDialogRegister', false)
                 commit('setRegisterEmail','')
                 commit('setRegisterName','')
-                commit('setRegisterPassword','')
                 return true
             } catch (error) {
-                console.log(error)
+                commit('error/setRegisterError',{
+                    message:error.response.data?error.response.data.message:error.message,
+                    code:error.response.status,
+                },{root:true})
+            }finally{
+                commit('setIsDoneRegister',true)
+                commit('setRegisterPassword','')
             }
         },
 

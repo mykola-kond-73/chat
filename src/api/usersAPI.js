@@ -1,7 +1,10 @@
 import { instance } from "./API"
 
 export const usersAPI={
-    async getUser(userId){
-        return await instance.get(`users/${userId}`) 
+    getUser(userId){
+        return  instance.get(`users/${userId}`) 
+    },
+    deleteUser(userId){
+        return instance.delete(`users/${userId}`)
     }
 }

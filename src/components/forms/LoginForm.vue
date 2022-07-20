@@ -12,7 +12,11 @@
                     <input type="password" name="password" :value="password"
                         @input="(e) => setAuthPassword(e.target.value)">
                 </div>
-                <button type="submit" name="sendBtn">Надіслати</button>
+                <div v-if="error">
+                    <Error :error="error" />
+                </div>
+                <Load v-if="!isDoneLogin" />
+                <button v-else type="submit" name="sendBtn">Надіслати</button>
             </form>
 
         </div>
@@ -21,42 +25,46 @@
 
 <script>
 import { mapActions, mapMutations, mapState } from 'vuex';
+import Error from '../errors/Error.vue';
+import Load from '../Load.vue';
 // import {email,required,minLength} from 'vuelidate/lib/validators'
 
 export default {
+    components: { Error, Load },
 
     computed: {
         ...mapState({
             isShow: state => state.auth.isShowDialogLogin,
-
+            isDoneLogin: state => state.auth.isDoneLogin,
             login: state => state.auth.authObj.login,
-            password: state => state.auth.authObj.password
+            password: state => state.auth.authObj.password,
+            error: state => state.error.loginError
         })
     },
     methods: {
         ...mapActions({
-            loginAction: 'auth/login'
+            loginAction: "auth/login"
         }),
-
         ...mapMutations({
-            setAuthLogin: 'auth/setAuthLogin',
-            setAuthPassword: 'auth/setAuthPassword',
-            setIsShowDialogLogin: 'auth/setIsShowDialogLogin'
-        }),
+            setAuthLogin: "auth/setAuthLogin",
+            setAuthPassword: "auth/setAuthPassword",
+            setIsShowDialogLogin: "auth/setIsShowDialogLogin",
 
+            setLoginError: 'error/setLoginError'
+        }),
         async submitHendler() {
-            const log =await this.loginAction({ login: this.login, password: this.password })
+            const log = await this.loginAction({ login: this.login, password: this.password });
             if (log) {
-                this.$router.push('/rooms')
+                this.$router.push("/rooms");
             }
         },
-
         castHandler() {
-            this.setIsShowDialogLogin(false)
-            this.setAuthLogin('')
-            this.setAuthPassword('')
+            this.setIsShowDialogLogin(false);
+            this.setAuthLogin("");
+            this.setAuthPassword("");
+            this.setLoginError(null)
         }
-    }
+    },
 }
 </script>
 
@@ -79,5 +87,4 @@ export default {
     min-width: 300px;
     padding: 20px;
 }
-
 </style>

@@ -23,8 +23,11 @@
                     <input type="password" name="repeatPassword" :value="repeatPassword"
                         @input="(e) => setRepeatPassword(e.target.value)">
                 </div>
-
-                <button type="submit" name="sendBtn">Зареєструватися</button>
+                <div v-if="error">
+                    <Error :error="error" />
+                </div>
+                <Load v-if="!isDoneRegister" />
+                <button v-else type="submit" name="sendBtn">Зареєструватися</button>
             </form>
 
         </div>
@@ -33,8 +36,11 @@
 
 <script>
 import { mapActions, mapMutations, mapState } from 'vuex'
+import Error from '../errors/Error.vue';
+import Load from '../Load.vue';
 
 export default {
+    components: { Error, Load },
     data() {
         return {
             repeatPassword: ''
@@ -48,6 +54,8 @@ export default {
             name: state => state.auth.registerObj.name,
             password: state => state.auth.registerObj.password,
 
+            isDoneRegister: state => state.auth.isDoneRegister,
+            error: state => state.error.registerError
         })
     },
     methods: {
@@ -60,6 +68,8 @@ export default {
             setRegisterName: 'auth/setRegisterName',
             setRegisterPassword: 'auth/setRegisterPassword',
             setIsShowDialogRegister: 'auth/setIsShowDialogRegister',
+
+            setRegisterError: 'error/setRegisterError'
         }),
 
         submitHendler() {
@@ -69,9 +79,10 @@ export default {
                     name: this.name,
                     password: this.password
                 })
-            }else{
+            } else {
                 console.log('паролі не співпадають')
             }
+            this.repeatPassword = ''
         },
 
         castHandler() {
@@ -79,6 +90,8 @@ export default {
             this.setRegisterEmail('')
             this.setRegisterName('')
             this.setRegisterPassword('')
+            this.repeatPassword = ''
+            this.setRegisterError(null)
         },
 
         setRepeatPassword(data) {

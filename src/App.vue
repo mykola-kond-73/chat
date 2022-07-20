@@ -1,18 +1,21 @@
 <template>
   <div class="app">
-    <div>
-      <Header />
-    </div>
+    
+        <div>
+          <Header />
+        </div>
 
-      <LoginForm/>
-      <RegisterForm/>
 
-    <div>
-      <router-view></router-view>
-    </div>
-    <div>
+        <LoginForm />
+        <RegisterForm />
 
-    </div>
+        <div>
+          <router-view></router-view>
+        </div>
+        <div>
+
+        </div>
+      
   </div>
 </template>
 
@@ -25,16 +28,16 @@ export default {
   components: {
     Header,
     LoginForm,
-    RegisterForm
-}
+    RegisterForm,
+  }
 
 }
 </script>
 
 <style>
-*{
-      margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 </style>

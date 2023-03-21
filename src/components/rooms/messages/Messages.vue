@@ -3,9 +3,7 @@
         <div v-if="isMessages">Load...</div>
         <div>
             <div class="msgHeader">
-                <div>
-                    {{ roomId }}
-                </div>
+              
                 <div v-if="roomId">
                     <div v-if="isDoneDeleteRoom" @click="deleteRoom({ roomId, userId })">
                         Видалити чат
@@ -13,15 +11,15 @@
                     <Load v-else/>
                 </div>
             </div>
-            <div class="messagesCont" @scroll="scrollHadler">
+            <div class="messagesCont" @scroll="scrollHadler" >
                 <div v-if="!isDoneMessages">Load...</div>
                 <div v-else v-for="message in messages">
                     <Message :message="message" :userId="userId" />
                 </div>
             </div>
-            <div class="msgForm">
+            <div class="msgForm" v-if="roomId">
                 <UpdateMessageForm v-if="isUpdate" />
-                <CreateMEssageForm v-else :roomId="roomId" userId="userId" />
+                <CreateMEssageForm v-else :socket="socket" />
             </div>
         </div>
     </div>
@@ -36,7 +34,7 @@ import Load from '@/components/Load.vue';
 
 export default {
     components: { Message, CreateMEssageForm, UpdateMessageForm, Load },
-
+    inject:['socket'],
     data() {
         return {
             isMessages: Boolean(this.messages)
@@ -59,7 +57,10 @@ export default {
     },
     methods: {
         ...mapMutations({
-            setPage: 'messages/setPage'
+            setPage: 'messages/setPage',
+
+            deleteMessage:'messages/deleteMessage',
+            updateMessage:'messages/updateMessage',
         }),
         ...mapActions({
             deleteRoom: 'rooms/deleteRoom',
@@ -68,12 +69,28 @@ export default {
 
         scrollHadler(e) {
 
-            // if (e.target.scrollTop <= 5) {
+            // if (e.target.scrollTop <= 20) {
             //     this.setPage(this.page + 1)
             //     this.getMessages({ roomId: this.roomId, page: this.page, count: this.count })
             // }
         }
+    },
+
+    created() {
+        this.socket.on('deleteFromServer', (message) => {
+            this.deleteMessage(message)
+        }),
+
+        this.socket.on('updateFromServer', async (message) => {
+            this.updateMessage(message)
+        })
+    },
+    unmounted(){
+        this.socket.removeAllListeners('deleteFromServer')
+        this.socket.removeAllListeners('updateFromServer')
+
     }
+
 }
 </script>
 

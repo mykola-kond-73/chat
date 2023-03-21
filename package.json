@@ -4,22 +4,33 @@
   "private": true,
   "scripts": {
     "start:dev": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "test": "vitest",
+    "ts:w": "tsc -w",
+    "ts": "npx tsc",
+    "lint": "eslint -c .eslintrc.yml --ext .js,.jsx,.ts,.tsx .",
+    "lint:fix": "npm run lint -- --fix"
   },
   "dependencies": {
     "@braid/vue-formulate": "^2.5.3",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
+    "socket.io-client": "^4.5.1",
     "vue": "^3.2.13",
+    "vue-3-socket.io": "^1.0.5",
     "vue-router": "^4.0.3",
     "vuelidate": "^0.7.7",
     "vuex": "^4.0.0"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~5.0.0",
+    "@testing-library/vue": "^6.4.2",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "@vue/cli-plugin-babel": "~5.0.8",
     "@vue/cli-plugin-router": "~5.0.0",
     "@vue/cli-plugin-vuex": "~5.0.0",
-    "@vue/cli-service": "~5.0.0"
+    "@vue/cli-service": "^5.0.8",
+    "happy-dom": "^8.1.1",
+    "vitest": "^0.26.3"
   },
   "browserslist": [
     "> 1%",

@@ -50,7 +50,8 @@ export default {
             isAuth: state => state.auth.isAuth,
             isDoneUnlogin: state => state.auth.isDoneUnlogin,
             user: state => state.user.user,
-            isDoneUser: state => state.user.isDoneDeleteUser
+            isDoneUser: state => state.user.isDoneDeleteUser,
+
         })
     },
     methods: {

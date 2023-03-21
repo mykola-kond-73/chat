@@ -1,4 +1,5 @@
 import {authAPI} from '@/api/authAPI'
+import { DefaultError } from '@/utils/errors/defaultError'
 
 export default {
     state: function () {
@@ -23,7 +24,6 @@ export default {
                 name: '',
                 password: ''
             },
-
 
         }
     },
@@ -81,8 +81,11 @@ export default {
                 commit('setIsDoneLogin',false)
 
                 const response=await authAPI.login(payload)
+                if(!response) throw new DefaultError('Помилка логінізації',400)
                 commit('error/setLoginError',null,{root:true})
                 commit('setUserId',response.data.userId)
+        
+                localStorage.setItem("token",response.data.accessToken)
                 
                 commit('setIsAuth', true)
                 commit('setIsShowDialogLogin', false)
@@ -93,8 +96,8 @@ export default {
                 return true
             } catch (error) {
                 commit('error/setLoginError',{
-                    message:error.response.data?error.response.data.message:error.message,
-                    code:error.response.status,
+                    message:error.response?error.response.data.message:error.message,
+                    code:error.response?error.response.status:error.status,
                 },{root:true})
             }finally{
                 commit('setIsDoneLogin',true)
@@ -106,8 +109,10 @@ export default {
         async unlogin({commit}) {
             try {
                 commit('setIsDoneUnlogin',false)
-                await authAPI.unlogin()
+                const response=await authAPI.unlogin()
+                if(!response) throw new DefaultError('Помилка виходу',400)
                 commit('error/setUnloginError',null,{root:true})
+                localStorage.removeItem('token')
 
                 commit('setIsAuth', false)
                 commit('user/setUserData',null,{root:true})
@@ -115,11 +120,13 @@ export default {
                 commit('messages/clearMessages',null,{root:true})
                 commit('messages/setRoomId',null,{root:true})
 
+                commit('rooms/setRooms',null,{root:true})
+
                 return true
             } catch (error) {
                 commit('error/setUnloginError',{
-                    message:error.response.data?error.response.data.message:error.message,
-                    code:error.response.status
+                    message:error.response?error.response.data.message:error.message,
+                    code:error.response?error.response.status:error.status,
                 },{root:true})
             }finally{
                 commit('setIsDoneUnlogin',true)
@@ -130,11 +137,12 @@ export default {
             try {
                 commit('setIsDoneRegister', false)
 
-                await authAPI.register({
+                const response=await authAPI.register({
                     email: state.registerObj.email,
                     name: state.registerObj.name,
                     password: state.registerObj.password
                 })
+                if(!response) throw new DefaultError('помилка реєстрації',400)
                 commit('error/setRegisterError',null,{root:true})
 
                 await dispatch('unlogin')
@@ -150,19 +158,13 @@ export default {
                 return true
             } catch (error) {
                 commit('error/setRegisterError',{
-                    message:error.response.data?error.response.data.message:error.message,
-                    code:error.response.status,
+                    message:error.response?error.response.data.message:error.message,
+                    code:error.response?error.response.status:error.status,
                 },{root:true})
             }finally{
                 commit('setIsDoneRegister',true)
                 commit('setRegisterPassword','')
             }
-        },
-
-        test() {
-            console.log('test')
-            authAPI.test()
-
         }
     },
 

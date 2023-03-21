@@ -1,4 +1,5 @@
 import {usersAPI} from '@/api/usersAPI'
+import { DefaultError } from '@/utils/errors/defaultError'
 
 export default {
     state: function () {
@@ -29,6 +30,7 @@ export default {
                 commit('setIsDoneUser', false)
 
                 const response = await usersAPI.getUser(userId)
+                if(!response) throw new DefaultError('Помилка запиту користувача',400)
                 commit('error/setGetUserError', null, {
                     root: true
                 })
@@ -38,8 +40,8 @@ export default {
                 commit('setUserData', response.data)
             } catch (error) {
                 commit('error/setGetUserError', {
-                    message: error.response.data ? error.response.data.message : error.message,
-                    code: error.response.status
+                    message:error.response?error.response.data.message:error.message,
+                    code:error.response?error.response.status:error.status,
                 }, {
                     root: true
                 })
@@ -51,7 +53,9 @@ export default {
         async deleteUser({commit,dispatch}, userId) {
             try {
                 commit('setIsDoneDeleteUser', false)
-                await usersAPI.deleteUser(userId)
+
+                const response=await usersAPI.deleteUser(userId)
+                if(!response) throw new DefaultError('Помилка видалення користувача',400)
                 commit('error/setDeleteUserError', null, {
                     root: true
                 })
@@ -62,8 +66,8 @@ export default {
                 return true
             } catch (error) {
                 commit('error/setDeleteUserError', {
-                    message: error.response.data ? error.response.data.message : error.message,
-                    code: error.response.status
+                    message:error.response?error.response.data.message:error.message,
+                    code:error.response?error.response.status:error.status,
                 }, {
                     root: true
                 })

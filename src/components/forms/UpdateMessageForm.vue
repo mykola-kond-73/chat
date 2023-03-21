@@ -1,5 +1,5 @@
 <template>
-    <form @submit.prevent="updateMessageAction({messageId:updateMessageId,newMessage:updateMessage})">
+    <form @submit.prevent="updateMessageAction({messageId:updateMessageId,newMessage:updateMessage,socket,roomId})">
         <textarea rows="2" :value="updateMessage" @input="(e)=>setUpdateMessage(e.target.value)"></textarea>
         <button type="submit" v-if="isDoneUpdateMessage">Оновити</button>
         <Load v-else/>
@@ -11,6 +11,7 @@ import { mapActions, mapMutations, mapState } from 'vuex';
 import Load from '../Load.vue';
 
 export default {
+    inject: ["socket"],
     data() {
         return {
             message: ""
@@ -20,7 +21,9 @@ export default {
         ...mapState({
             isDoneUpdateMessage: state => state.messages.isDoneUpdateMessage,
             updateMessageId: state => state.messages.updateMessageId,
-            updateMessage: state => state.messages.updateMessage
+            updateMessage: state => state.messages.updateMessage,
+
+            roomId: state => state.messages.roomId,
         })
     },
     methods: {

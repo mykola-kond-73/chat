@@ -4,6 +4,7 @@ export default {
             loginError:null,
             unloginError:null,
             registerError:null,
+            refreshError:null,
 
             getUserError:null,
             deleteUserError:null,
@@ -12,6 +13,7 @@ export default {
             getRoomsError:null,
             deleteRoomError:null,
 
+            createMessageError:null,
             getMessagesError:null,
             updateMessageError:null,
             deleteMessageError:null,
@@ -27,6 +29,9 @@ export default {
         },
         setRegisterError(state,payload){
             state.registerError=payload
+        },
+        setRefreshError(state,payload){
+            state.refreshError=payload
         },
 
         setGetUserError(state,payload){
@@ -46,6 +51,9 @@ export default {
             state.deleteRoomError=payload
         },
 
+        setCreateMessageError(state,payload){
+            state.createMessageError=payload
+        },
         setGetMessagesError(state,payload){
             state.getMessagesError=payload
         },

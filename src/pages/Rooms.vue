@@ -1,5 +1,5 @@
 <template>
-    <Load v-if="!isDoneUser"/>
+    <Load v-if="!isDoneUser" data-testid="rooms-page"/>
     <div v-else class="root">
         <Chats/>
         <Messages/>
@@ -14,18 +14,26 @@ import Load from '@/components/Load.vue';
 
 export default {
     components: { Chats, Messages, Load },
+    // inject: ['socket'],
+    data(){
+        return{
+            room:{}
+        }
+    },  
     computed: {
         ...mapState({
             isAuth: state => state.auth.isAuth,
             isDoneUser: state => state.user.isDoneUser,
         })
-
-
     },
     mounted() {
-        if (!this.isAuth)
-            this.$router.push("/");
+        if (!this.isAuth) this.$router.push("/")        
     },
+    watch:{
+        isAuth(newValue){
+            if (!newValue) this.$router.push("/")
+        }
+    }
 }
 </script>
 
@@ -36,7 +44,7 @@ export default {
     height: 100vh;
 
     grid-template-areas:
-    "r m";
+        "r m";
 
     grid-template-columns: 300px 1fr;
 }
